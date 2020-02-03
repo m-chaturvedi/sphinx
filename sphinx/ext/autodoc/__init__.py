@@ -493,12 +493,14 @@ class Documenter:
                 else:
                     logger.warning(__('missing attribute %s in object %s') %
                                    (name, self.fullname), type='autodoc')
-            return False, sorted(selected)
+            return False, sorted(selected, key=lambda e: e[0].lower())
         elif self.options.inherited_members:
-            return False, sorted((m.name, m.value) for m in members.values())
+            return False, sorted([(m.name, m.value) for m in members.values()],
+                    key=lambda e: e[0].lower())
         else:
-            return False, sorted((m.name, m.value) for m in members.values()
-                                 if m.directly_defined)
+            return False, sorted([(m.name, m.value) for m in members.values()
+                                 if m.directly_defined],
+                                 key=lambda e: e[0].lower())
 
     def filter_members(self, members: List[Tuple[str, Any]], want_all: bool
                        ) -> List[Tuple[str, Any, bool]]:
