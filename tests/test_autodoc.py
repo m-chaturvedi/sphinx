@@ -660,6 +660,7 @@ def test_autodoc_ignore_module_all(app):
     actual = do_autodoc(app, 'module', 'target', options)
     assert list(filter(lambda l: 'class::' in l, actual)) == [
         '.. py:class:: Class(arg)',
+        '.. py:class:: Class2()',
         '.. py:class:: CustomDict',
         '.. py:class:: InstAttCls()',
         '.. py:class:: Outer',
@@ -897,6 +898,58 @@ def test_autodoc_member_order(app):
         '   .. py:method:: Class.undocmeth()'
     ]
 
+    # member-order = bysource
+    options = {"members": None,
+               'member-order': 'bysource',
+               "undoc-members": True,
+               'private-members': True,
+               "special-members": "__init__"}
+
+    actual = do_autodoc(app, 'class', 'target.Class2', options)
+    P = list(filter(lambda l: '::' in l, actual))
+    assert list(filter(lambda l: '::' in l, actual)) == [
+        '.. py:class:: Class2()',
+        '   .. py:method:: Class2.meth()',
+        '   .. py:attribute:: Class2.docattr',
+        '   .. py:method:: Class2.__init__()',
+        '   .. py:method:: Class2.Meth()',
+    ]
+
+    ##################################
+    # member-order = groupwise, it's sorted alphabetically inside the groups
+    # https://github.com/sphinx-doc/sphinx/blob/64f7dd2379e2e36ea2155de1d1cc855c93066c56/sphinx/ext/autodoc/__init__.py#L642
+    options = {"members": None,
+               'member-order': 'groupwise',
+               "undoc-members": True,
+               'private-members': True,
+               "special-members": "__init__"}
+
+    actual = do_autodoc(app, 'class', 'target.Class2', options)
+    P = list(filter(lambda l: '::' in l, actual))
+    assert list(filter(lambda l: '::' in l, actual)) == [
+        '.. py:class:: Class2()',
+        '   .. py:method:: Class2.Meth()',
+        '   .. py:method:: Class2.__init__()',
+        '   .. py:method:: Class2.meth()',
+        '   .. py:attribute:: Class2.docattr',
+    ]
+
+    ##################################
+    # member_order = None (alphabetic, by default)
+    options = {"members": None,
+               "undoc-members": True,
+               'private-members': True,
+               "special-members": "__init__"}
+
+    actual = do_autodoc(app, 'class', 'target.Class2', options)
+    P = list(filter(lambda l: '::' in l, actual))
+    assert list(filter(lambda l: '::' in l, actual)) == [
+        '.. py:class:: Class2()',
+        '   .. py:method:: Class2.Meth()',
+        '   .. py:method:: Class2.__init__()',
+        '   .. py:attribute:: Class2.docattr',
+        '   .. py:method:: Class2.meth()',
+    ]
 
 @pytest.mark.sphinx('html', testroot='ext-autodoc')
 def test_autodoc_module_scope(app):

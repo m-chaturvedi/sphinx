@@ -86,6 +86,22 @@ class Class(object):
         pass
 
 
+class Class2(object):
+    """Class2 documentation."""
+
+    def meth(self):
+        """method meth"""
+
+    docattr = 'baz'
+    """docstring for an attribute"""
+    
+    def __init__(self):
+        """__init__ method"""
+
+    def Meth(self):
+        """method Meth"""
+
+
 class CustomDict(dict):
     """Docstring."""
 
